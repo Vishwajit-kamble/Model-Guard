@@ -1,0 +1,1270 @@
+PROJECT: ModelGuard AI
+Premium Frontend Design & Development Specification
+1. YOUR ROLE
+
+Act as a world-class SaaS product designer, senior frontend engineer, motion designer, and UX architect.
+
+Build a complete, polished, production-quality frontend for ModelGuard AI, an intelligent Machine Learning model monitoring platform.
+
+The product helps developers deploy machine learning models, monitor their behavior, detect changes in incoming data, identify potential reliability problems, and understand what needs attention.
+
+The interface must be visually distinctive, intuitive, responsive, accessible, and technically functional.
+
+Do not create a generic admin dashboard.
+
+Create a memorable product experience that feels like a combination of:
+
+A premium AI observability platform.
+A futuristic scientific monitoring laboratory.
+A beautiful, editorial SaaS application.
+An intelligent digital command center.
+
+The result should be visually impressive enough for a portfolio presentation, LinkedIn post, project demonstration, and technical interview.
+
+2. PRODUCT VISION
+
+Product name: ModelGuard AI
+
+Tagline: "Your models deserve a second pair of eyes."
+
+Alternative headline:
+"Know when your AI starts changing."
+
+Supporting description:
+
+"Monitor your machine learning models, understand changing data patterns, and investigate potential reliability issues before they go unnoticed."
+
+Primary goal:
+
+Help users understand the current state of their machine learning models without requiring advanced knowledge of machine learning or cloud infrastructure.
+
+A non-technical user should be able to open the dashboard and understand these questions within seconds:
+
+Is my model working?
+How many predictions has it made?
+Is anything unusual happening?
+What does the warning mean?
+What should I do next?
+
+Every major design decision must support these five questions.
+
+3. UNIQUE VISUAL IDENTITY
+Design concept: "The Living Intelligence Observatory"
+
+The central visual metaphor is a living observatory that continuously watches machine learning models.
+
+Represent each registered model as an intelligent entity with a recognizable visual identity.
+
+A healthy model appears calm, stable, and balanced.
+
+A model experiencing unusual input patterns displays subtle visual changes.
+
+A model requiring attention becomes visually highlighted, with a clear explanation and recommended action.
+
+Use animation to communicate meaningful state changes rather than decorating the interface randomly.
+
+Color palette
+
+Create a sophisticated light-first interface.
+
+Primary background:
+Warm ivory: #F7F7F2
+
+Main surface:
+Pure white: #FFFFFF
+
+Primary text:
+Deep midnight: #17212B
+
+Secondary text:
+Slate gray: #64748B
+
+Primary accent:
+Electric indigo: #635BFF
+
+Secondary accent:
+Fresh mint: #79E2B5
+
+Supporting accent:
+Soft sky blue: #A9D8FF
+
+Warning:
+Warm amber: #F4B942
+
+Critical:
+Coral red: #F16C68
+
+Borders:
+Soft neutral gray: #E7E9E4
+
+Use gradients sparingly.
+
+Preferred gradient:
+Indigo to violet with a subtle blue highlight.
+
+Avoid:
+
+Excessive neon colors.
+Pure black backgrounds throughout the application.
+Overused purple gradients on every card.
+Excessive glassmorphism.
+Glowing borders around every component.
+Unreadable low-contrast gray text.
+Rainbow-colored charts.
+
+The product should feel elegant, calm, intelligent, and trustworthy.
+
+Typography
+
+Use:
+
+Inter for interface text.
+A distinctive display font such as Manrope for large headings.
+
+Create a clear hierarchy:
+
+Large editorial page titles.
+Medium-weight section headings.
+Compact labels.
+Comfortable body text.
+Tabular numbers for metrics.
+
+Keep important information readable at normal desktop viewing distances.
+
+Layout personality
+
+Use:
+
+Generous whitespace.
+Asymmetric but balanced compositions.
+Rounded cards with approximately 16–24px corner radii.
+Thin borders.
+Subtle, natural shadows.
+Small illustrated details.
+Carefully controlled motion.
+Consistent spacing.
+
+Avoid the standard layout where every section consists of four identical metric cards followed by generic charts.
+
+Make the composition visually interesting while maintaining usability.
+
+4. TECHNOLOGY STACK
+
+Build the frontend using:
+
+React.
+TypeScript.
+Vite.
+Tailwind CSS.
+Framer Motion or Motion for React.
+Lucide React icons.
+Recharts for data visualizations.
+React Router for navigation.
+React Hook Form for form handling where useful.
+Zod for validating frontend form data.
+
+Use reusable components and a clear project structure.
+
+Do not introduce unnecessary libraries.
+
+Use semantic HTML, accessible controls, and responsive layouts.
+
+Ensure the project runs correctly using the commands documented in its README.
+
+5. APPLICATION INFORMATION ARCHITECTURE
+
+Create the following pages:
+
+Welcome / onboarding.
+Main dashboard.
+Models.
+Model details.
+Predictions explorer.
+Monitoring and data drift.
+Alerts and incidents.
+Model registration.
+Settings.
+
+Use a consistent navigation system across the application.
+
+The interface must feel like one cohesive product rather than a collection of unrelated pages.
+
+6. SIDEBAR DESIGN
+
+Create a beautiful, collapsible sidebar.
+
+At the top:
+
+Original ModelGuard AI wordmark.
+A small abstract orbital symbol representing continuous monitoring.
+
+Navigation groups:
+
+OVERVIEW
+
+Command Center
+
+MODELS
+
+All Models
+Register Model
+
+MONITORING
+
+Model Health
+Data Drift
+Predictions
+Alerts
+
+WORKSPACE
+
+Settings
+Help & Documentation
+
+At the bottom:
+
+Workspace identity.
+Small status indicator for backend connectivity.
+User avatar placeholder.
+Collapse button.
+
+Design details:
+
+The active navigation item should have a distinctive soft-indigo background and a narrow animated accent.
+
+Icons should be recognizable and consistent.
+
+On mobile, replace the sidebar with an accessible slide-out navigation drawer.
+
+Do not display fake real-time connectivity. If the backend is unavailable, show a clear disconnected state.
+
+7. PAGE ONE: COMMAND CENTER
+
+This is the most important page.
+
+It must immediately communicate the product's purpose and current system state.
+
+A. Welcome section
+
+Create a personalized greeting:
+
+"Good morning, Sanskruti."
+
+Below it:
+
+"Here's what's happening with your models today."
+
+Include a small date label and a last-updated timestamp.
+
+Do not make the page resemble a corporate analytics template.
+
+Use a slightly asymmetric hero composition.
+
+B. Hero component: Model Observatory
+
+Create a distinctive animated centerpiece called "Model Observatory."
+
+Visual concept:
+
+A large, elegant circular monitoring visualization containing:
+
+A central model symbol.
+Several softly animated orbital paths.
+Small nodes representing recent prediction activity.
+A subtle pulse representing incoming monitoring events.
+A status indicator.
+
+The central object represents the selected model.
+
+Its appearance should respond to the model's actual status.
+
+Healthy:
+Soft mint center, stable orbit, gentle breathing animation.
+
+Warning:
+Amber indicator, slightly more active orbit, visible warning label.
+
+Critical:
+Coral indicator, restrained attention animation, explicit critical status.
+
+Do not use flashing lights.
+
+Include an accessible textual status alongside the visualization.
+
+Below the visualization, show:
+
+Model name: Iris Classifier
+
+Status: Healthy
+
+Last prediction: timestamp from actual data
+
+Button: "Explore model"
+
+Add a compact explanation:
+
+"Your model is responding normally, and no significant input-distribution changes have been detected in the latest evaluation."
+
+Only display this statement if the underlying monitoring data supports it.
+
+If monitoring data is missing, display:
+
+"Monitoring has not started yet."
+
+C. Primary metrics
+
+Display four important metrics.
+
+Total predictions.
+Average response time.
+Prediction errors.
+Active drift alerts.
+
+Each metric should include:
+
+Large readable value.
+Small explanatory label.
+Relevant icon.
+A subtle sparkline where sufficient historical data exists.
+A comparison with a previous period only when that data is available.
+
+Example:
+
+TOTAL PREDICTIONS
+12,480
+
+"Requests processed during the selected period."
+
+AVERAGE LATENCY
+42 ms
+
+"Typical time required to return a prediction."
+
+PREDICTION ERRORS
+18
+
+"Requests that failed during the selected period."
+
+ACTIVE DRIFT ALERTS
+2
+
+"Features requiring investigation."
+
+These values are design examples only.
+
+When real API data is available, use actual values.
+
+When data is unavailable, display a clearly labeled demo state instead of presenting fabricated values as live measurements.
+
+D. Model health timeline
+
+Create a beautiful horizontal timeline showing model activity throughout the selected period.
+
+Events may include:
+
+Model started.
+Prediction volume increased.
+Input distribution changed.
+Monitoring alert generated.
+Model version updated.
+Incident resolved.
+
+Each event should have:
+
+A timestamp.
+A short title.
+A clear status.
+An optional explanation.
+
+Clicking an event opens the corresponding details.
+
+E. Model health trend
+
+Create a chart showing model health-related metrics over time.
+
+Do not combine unrelated metrics on a misleading shared scale.
+
+Use separate visualizations for:
+
+Request volume.
+Response latency.
+Error rate.
+Drift statistics.
+
+Provide a time selector:
+
+Last hour.
+Last 24 hours.
+Last 7 days.
+
+Only offer periods supported by the backend.
+
+Include accessible chart labels and tooltips.
+
+F. Recommended next action
+
+Add a distinctive panel called:
+
+"Recommended next step"
+
+Example:
+
+"Review the recent change in petal-width distribution."
+
+Explanation:
+
+"The latest evaluation indicates that incoming petal-width measurements differ from the reference dataset."
+
+Action:
+"Investigate drift"
+
+This recommendation must be based on an actual monitoring event or explicitly labeled demonstration data.
+
+8. PAGE TWO: MODELS
+
+Build a beautiful model library.
+
+The design should feel like an organized collection of intelligent systems.
+
+Use a combination of compact model cards and a table view.
+
+Each model card includes:
+
+Model icon or abstract illustration.
+Model name.
+Model version.
+Model type.
+Deployment status.
+Total predictions.
+Average latency.
+Last activity.
+Current monitoring status.
+
+Example models:
+
+Iris Classifier
+Type: Classification
+Version: 1.0
+
+House Price Predictor
+Type: Regression
+Version: 1.2
+
+Customer Churn Predictor
+Type: Classification
+Version: 2.0
+
+These are example records, not actual deployed models.
+
+Clearly mark demonstration models when using sample data.
+
+Provide:
+
+Search.
+Status filters.
+Model-type filters.
+Sorting.
+Empty states.
+Pagination if required.
+
+Primary action:
+"Register a model"
+
+Secondary action:
+"View details"
+
+Create a polished empty state for users who have not registered any models.
+
+Example:
+
+"Your observatory is waiting for its first model."
+
+"Register a model to begin monitoring its predictions and input data."
+
+Button:
+"Register your first model"
+
+9. PAGE THREE: MODEL DETAILS
+
+This page should explain an individual model clearly.
+
+Header:
+
+Model name.
+Version.
+Status.
+Registration date.
+Model type.
+
+Actions:
+
+Test prediction.
+View API details.
+Compare versions.
+Open monitoring.
+
+Create four sections.
+
+A. Overview
+
+Show:
+
+Model description.
+Input features.
+Output type.
+Training dataset reference.
+Current deployment state.
+Latest activity.
+B. Prediction activity
+
+Show prediction volume and response latency over time.
+
+C. Reliability indicators
+
+Show available information about:
+
+Request failures.
+Input validation errors.
+Data drift.
+Model performance when labels are available.
+
+Do not display model accuracy unless it has been calculated from a suitable labeled evaluation dataset.
+
+D. Version history
+
+Display a chronological list of registered versions.
+
+Allow users to compare evaluation metrics between versions using the same test dataset.
+
+If a version comparison has not been performed, explain how to initiate it.
+
+10. PAGE FOUR: PREDICTIONS EXPLORER
+
+Build an intuitive prediction testing interface.
+
+Use the Iris classifier as the first supported demonstration model.
+
+Left section: Input form
+
+Create four elegant input controls:
+
+Sepal length.
+Sepal width.
+Petal length.
+Petal width.
+
+Provide:
+
+Input validation.
+Appropriate numerical ranges.
+Helpful descriptions.
+Example input values.
+A clear reset button.
+
+Primary action:
+"Run prediction"
+
+While the request is running:
+
+Disable duplicate submissions.
+Show a compact animated processing state.
+Explain that the model is processing the input.
+Right section: Prediction result
+
+Display:
+
+Predicted species.
+Confidence scores if the model provides meaningful probabilities.
+Response latency.
+Model version.
+Request timestamp.
+
+Use an attractive result card.
+
+For example:
+
+"Your model's prediction"
+
+Iris-setosa
+
+"Prediction completed successfully."
+
+Show class probabilities only if calculated by the model. Explain that model confidence is not necessarily the probability that a prediction is correct.
+
+Include an option to inspect the request and response.
+
+Add a recent prediction history table below the form.
+
+The table should include:
+
+Time.
+Input summary.
+Prediction.
+Latency.
+Request status.
+
+Clicking a row opens a detailed view.
+
+11. PAGE FIVE: MONITORING & DATA DRIFT
+
+This is the signature page of ModelGuard AI.
+
+Make it visually distinctive and easy to understand.
+
+A. Human-readable introduction
+
+Title:
+
+"Is your model seeing something new?"
+
+Supporting text:
+
+"Compare the data your model receives today with the data it was trained on."
+
+Include a small illustrative explanation showing:
+
+Reference data → Incoming data → Comparison → Result
+
+B. Feature monitoring cards
+
+Create a card for each monitored feature.
+
+For the Iris classifier:
+
+Sepal length.
+Sepal width.
+Petal length.
+Petal width.
+
+Each card should display:
+
+Feature name.
+Sample count.
+Reference distribution.
+Recent distribution.
+Drift statistic.
+Evaluation status.
+
+Use small distribution charts rather than generic progress bars.
+
+C. Distribution comparison
+
+Create a beautiful chart that compares reference and incoming data.
+
+Use two distinguishable colors with clear labels.
+
+Include:
+
+A legend.
+Tooltips.
+Sample sizes.
+Statistical result.
+Plain-language explanation.
+
+Example explanation:
+
+"The incoming values for petal width differ from the reference dataset. This may indicate a change in the data your model receives."
+
+Do not state that the model has become inaccurate unless labeled evaluation data confirms a performance change.
+
+D. Drift status
+
+Use three understandable states:
+
+HEALTHY
+"No significant drift detected in the latest evaluation."
+
+WARNING
+"A possible distribution change needs review."
+
+INSUFFICIENT DATA
+"Collect more observations before drawing a conclusion."
+
+Add a fourth state if the backend reports a critical monitoring condition.
+
+Never classify a model as healthy solely because no data has been collected.
+
+E. Monitoring controls
+
+Provide:
+
+Run evaluation.
+Select evaluation window.
+Select reference dataset.
+View previous evaluations.
+
+Disable controls that are unsupported by the backend.
+
+Show loading, error, and success states.
+
+12. PAGE SIX: ALERTS AND INCIDENTS
+
+Create an incident management experience that feels more like an intelligent investigation workspace than a generic notification list.
+
+Each alert should have:
+
+Severity.
+Title.
+Affected model.
+Detection timestamp.
+Status.
+Short explanation.
+Link to evidence.
+
+Filters:
+
+All.
+Critical.
+Warning.
+Resolved.
+Alert details
+
+Clicking an alert opens a dedicated details page or side panel.
+
+Include:
+
+What happened?
+Which model is affected?
+What evidence supports the finding?
+What might it mean?
+What should the developer investigate next?
+
+Example:
+
+ALERT
+"Input distribution changed"
+
+AFFECTED FEATURE
+Petal width
+
+OBSERVATION
+"The latest evaluation found a difference between the reference and incoming distributions."
+
+POSSIBLE IMPACT
+"The model may be receiving data that differs from its training environment."
+
+RECOMMENDED ACTION
+"Review the incoming data source and validate model performance using labeled outcomes."
+
+Actions:
+
+Mark as reviewed.
+Resolve alert.
+View evaluation.
+Export report.
+
+Only display actions that the backend actually supports.
+
+13. PAGE SEVEN: REGISTER A MODEL
+
+Build a guided onboarding wizard.
+
+Use a clear step indicator.
+
+STEP 1 — MODEL INFORMATION
+
+Fields:
+
+Model name.
+Description.
+Model type.
+Version.
+
+STEP 2 — MODEL ARTIFACT
+
+Allow the user to upload a supported model artifact.
+
+Show:
+
+File name.
+File size.
+Supported formats.
+Validation state.
+
+Never load arbitrary uploaded model artifacts directly into the application process without validation and isolation.
+
+For the first version, it is acceptable to support only the bundled Iris model and demonstrate the registration workflow.
+
+STEP 3 — INPUT SCHEMA
+
+Allow the user to define or confirm model input features.
+
+For the Iris model, provide the four required features automatically.
+
+STEP 4 — REFERENCE DATA
+
+Allow the user to select or upload a reference dataset for monitoring.
+
+Explain why reference data is needed.
+
+STEP 5 — REVIEW AND REGISTER
+
+Display a summary of the configuration.
+
+Primary action:
+"Register model"
+
+Show progress, validation errors, and a success screen.
+
+After registration, navigate to the new model's details page.
+
+The wizard must have working navigation and validation. Do not build a decorative wizard with nonfunctional buttons.
+
+14. PAGE EIGHT: SETTINGS
+
+Include:
+
+Workspace information.
+Theme preference.
+Notification preferences.
+Monitoring defaults.
+API configuration information.
+Security guidance.
+Data retention information.
+
+For the prototype, keep sensitive API credentials out of the frontend.
+
+Never expose service-role keys, cloud secret keys, or private environment variables in client-side code.
+
+Use environment variables appropriately and document which variables are safe for browser exposure.
+
+15. SIGNATURE ANIMATIONS
+
+Animation is important to the identity of this product, but it must remain purposeful.
+
+Use Motion for React or Framer Motion.
+
+Animation 1: Observatory entrance
+
+When the dashboard loads:
+
+The central model symbol fades in.
+Orbital rings appear sequentially.
+Small activity nodes emerge.
+The model status appears.
+Metric values transition into place.
+
+Keep the entire sequence subtle and reasonably fast.
+
+Do not delay interaction while animations finish.
+
+Animation 2: Prediction flow
+
+When the user clicks "Run prediction":
+
+The input card transitions into a processing state.
+A subtle visual signal moves toward the result panel.
+The result appears when the API responds.
+The measured latency is displayed.
+
+If the API fails, show a helpful error state rather than a fabricated prediction.
+
+Animation 3: Drift visualization
+
+When a monitoring evaluation completes:
+
+Reference and incoming distributions appear.
+The chart transitions smoothly to the latest values.
+A warning indicator appears if the evaluation identifies a significant change.
+The explanation panel expands.
+
+The animation must reflect actual results.
+
+Animation 4: Alert appearance
+
+When a new alert is received:
+
+Show a subtle entrance transition.
+Update the alert count.
+Add a clear text label.
+Avoid flashing or aggressive shaking.
+Animation 5: Navigation
+
+Use smooth transitions for:
+
+Sidebar selection.
+Page entry.
+Tabs.
+Dialogs.
+Expandable panels.
+Dropdown menus.
+
+Keep navigation responsive.
+
+Performance requirements
+Prefer transform and opacity animations.
+Avoid expensive continuous animations across the entire screen.
+Pause decorative motion when the tab is hidden where practical.
+Respect the user's reduced-motion preference.
+Do not animate every card independently.
+Avoid scroll hijacking and unnecessary parallax.
+
+The design must remain attractive even when animations are disabled.
+
+16. MICRO-INTERACTIONS
+
+Add carefully designed interactions throughout the application.
+
+Buttons:
+
+Subtle hover transitions.
+Clear pressed states.
+Visible focus indicators.
+Loading states.
+
+Cards:
+
+Gentle elevation on hover when appropriate.
+No unnecessary bouncing.
+No excessive scaling.
+
+Forms:
+
+Clear validation messages.
+Animated focus indicators.
+Helpful empty states.
+
+Charts:
+
+Tooltips.
+Hover highlights.
+Smooth updates.
+Clear legends.
+
+Dialogs:
+
+Proper focus management.
+Escape-key support.
+Accessible close controls.
+
+Toasts:
+
+Success.
+Warning.
+Error.
+Information.
+
+Avoid making important information available only through hover effects.
+
+17. RESPONSIVE DESIGN
+
+The application must work well on:
+
+Desktop.
+Laptop.
+Tablet.
+Mobile.
+
+Desktop:
+
+Persistent sidebar.
+Spacious monitoring visualizations.
+Multi-column dashboard layouts.
+
+Tablet:
+
+Collapsible navigation.
+Reduced chart density.
+Adaptive card layout.
+
+Mobile:
+
+Slide-out navigation.
+Single-column cards.
+Scrollable tables or compact alternatives.
+Touch-friendly controls.
+Simplified charts.
+No horizontal page overflow.
+
+Test at common viewport sizes.
+
+Do not merely shrink the desktop layout.
+
+Reorganize content according to screen size.
+
+18. DATA AND BACKEND INTEGRATION
+
+The frontend must be designed to integrate with a FastAPI backend.
+
+Create a dedicated API service layer.
+
+Example files:
+
+src/
+components/
+pages/
+layouts/
+hooks/
+services/
+api.ts
+models.ts
+predictions.ts
+monitoring.ts
+alerts.ts
+types/
+utils/
+
+Keep API logic separate from UI components.
+
+Use TypeScript interfaces for API request and response objects.
+
+Suggested endpoints:
+
+GET /health
+
+GET /models
+
+POST /models/register
+
+GET /models/{model_id}
+
+POST /predict
+
+GET /predictions
+
+GET /monitoring/{model_id}/drift
+
+POST /monitoring/{model_id}/evaluate
+
+GET /alerts
+
+GET /alerts/{alert_id}
+
+The exact endpoints may be adapted to the backend implementation.
+
+Do not assume an endpoint exists until it has been implemented.
+
+Use the backend's actual response schema.
+
+Create loading, empty, disconnected, and error states for every data-dependent page.
+
+If an API request fails:
+
+Explain what happened.
+Offer a retry action.
+Preserve user-entered form data where appropriate.
+Avoid replacing failed requests with invented results.
+
+Use environment variables for the backend URL.
+
+Example:
+
+VITE_API_BASE_URL=http://localhost:8000
+
+Provide an .env.example file.
+
+Never place secret keys in Vite environment variables because browser-exposed variables are not secret.
+
+19. DEMO DATA MODE
+
+The application should remain visually complete before the backend is connected.
+
+Implement a clearly labeled demonstration mode.
+
+In demonstration mode:
+
+Use deterministic sample models.
+Use sample predictions.
+Display simulated monitoring events.
+Include sample drift evaluations.
+Label the workspace "DEMO DATA".
+Keep sample data separate from real API data.
+
+Do not describe demonstration values as live measurements.
+
+When the backend is configured, switch to real data through an explicit configuration setting.
+
+Do not silently mix real and simulated values in the same metric.
+
+If the backend is unavailable, show a clear connection status.
+
+20. ACCESSIBILITY AND USABILITY
+
+The application must be understandable to non-technical users.
+
+Use plain-language labels.
+
+For example:
+
+Technical:
+"Feature distribution divergence."
+
+User-friendly:
+"The incoming data looks different from the data used during training."
+
+Technical:
+"Inference latency."
+
+User-friendly:
+"Time taken to return a prediction."
+
+Technical:
+"Prediction error rate."
+
+User-friendly:
+"Percentage of requests that failed."
+
+Provide short explanations for technical terms.
+
+Include:
+
+Accessible contrast.
+Keyboard navigation.
+Visible focus states.
+Semantic headings.
+Accessible form labels.
+Text alternatives for status indicators.
+Reduced-motion support.
+
+Never rely on color alone to communicate status.
+
+21. EMPTY, LOADING, AND ERROR STATES
+
+Every page must look intentional when data is missing.
+
+Empty model library:
+"Your first model is one step away."
+
+No predictions:
+"No predictions yet. Run your first prediction to start building a history."
+
+No drift evaluation:
+"Monitoring has not started. Run an evaluation to compare incoming data against your reference dataset."
+
+No alerts:
+"No active alerts. Your latest monitoring results are shown above."
+
+Insufficient data:
+"Not enough observations yet. Collect more data before evaluating distribution changes."
+
+API unavailable:
+"We couldn't reach the monitoring service. Check the connection and try again."
+
+Include relevant actions on each screen.
+
+Never leave the user staring at a blank chart or a spinning loader indefinitely.
+
+22. PROJECT QUALITY REQUIREMENTS
+
+The final implementation must include:
+
+A consistent design system.
+Reusable UI components.
+Functional navigation.
+Working forms.
+Working filters where displayed.
+Functional charts.
+Responsive layouts.
+API integration.
+Error handling.
+Loading and empty states.
+TypeScript type safety.
+No broken buttons.
+No dead links.
+No horizontal overflow.
+No console errors during normal operation.
+
+Use a sensible component hierarchy.
+
+Avoid creating a single enormous React component.
+
+Use shared components for:
+
+Sidebar.
+Header.
+Metric cards.
+Status badges.
+Chart panels.
+Tables.
+Empty states.
+Loading indicators.
+Dialogs.
+Toasts.
+23. DEVELOPMENT WORKFLOW
+
+Build the application in this order.
+
+PHASE 1 — FOUNDATION
+
+Set up React, TypeScript, Vite, and Tailwind CSS.
+Establish typography and color tokens.
+Build the application shell.
+Implement navigation.
+
+PHASE 2 — COMMAND CENTER
+
+Build the observatory visualization.
+Build metric cards.
+Build the model timeline.
+Build monitoring charts.
+
+PHASE 3 — CORE WORKFLOWS
+
+Model library.
+Prediction explorer.
+Model details.
+Registration wizard.
+
+PHASE 4 — MONITORING
+
+Feature comparison charts.
+Drift status.
+Alert management.
+Monitoring explanations.
+
+PHASE 5 — INTEGRATION
+
+Connect the FastAPI backend.
+Implement loading and error states.
+Add environment-based configuration.
+Test all API workflows.
+
+PHASE 6 — POLISH
+
+Add purposeful animations.
+Test responsive layouts.
+Improve accessibility.
+Verify empty states.
+Remove placeholder interactions.
+Test the complete user journey.
+
+Do not stop after generating a dashboard screenshot.
+
+Implement the actual application.
+
+24. FINAL ACCEPTANCE CRITERIA
+
+The project is complete only when:
+
+A user can navigate between all primary pages.
+A user can inspect registered models.
+A user can enter Iris measurements and request a prediction.
+The prediction result comes from the backend when real mode is enabled.
+Prediction history is displayed from the appropriate data source.
+Monitoring results are displayed accurately.
+Drift alerts explain the evidence behind the finding.
+The interface distinguishes real data from demo data.
+API failures are handled gracefully.
+The registration flow validates user input.
+The interface works on desktop and mobile.
+Animations are smooth and respect reduced-motion settings.
+The project runs using documented commands.
+No visible controls are decorative placeholders.
+The entire product feels cohesive, polished, and understandable.
+FINAL CREATIVE DIRECTION
+
+Create a unique visual identity for ModelGuard AI.
+
+Do not copy an existing dashboard screenshot or template.
+
+Use the Living Intelligence Observatory as the central design concept.
+
+The dashboard should tell a clear story:
+
+MODEL → PREDICTIONS → MONITORING → DRIFT DETECTION → INVESTIGATION → ACTION
+
+A first-time user should understand this workflow without reading a technical manual.
+
+Prioritize clarity over complexity, elegance over decoration, and functional interactions over impressive-looking mockups.
+
+The final result should look like a carefully designed AI SaaS product created by an experienced product team—not a generic dashboard generated from a template.
