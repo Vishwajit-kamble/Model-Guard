@@ -11,19 +11,33 @@ import {
   CheckCircle2,
   RefreshCw,
   ExternalLink,
+  User,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 
 export const SettingsPage: React.FC = () => {
-  const { isDemoMode, setDemoMode, systemHealth, refreshHealth, showToast } = useApp();
+  const {
+    isDemoMode,
+    setDemoMode,
+    systemHealth,
+    refreshHealth,
+    showToast,
+    userName,
+    setUserName,
+    userRole,
+    setUserRole,
+    userEmail,
+    setUserEmail,
+  } = useApp();
 
   const [apiUrl, setApiUrl] = useState<string>(api.getBaseUrl());
-  const [userName, setUserName] = useState<string>('Sanskruti');
+  const [localUserName, setLocalUserName] = useState<string>(userName);
+  const [localUserRole, setLocalUserRole] = useState<string>(userRole);
+  const [localNotifyEmail, setLocalNotifyEmail] = useState<string>(userEmail);
   const [workspaceName, setWorkspaceName] = useState<string>('Enterprise ML Observatory');
   const [evalInterval, setEvalInterval] = useState<string>('1h');
   const [alphaThreshold, setAlphaThreshold] = useState<number>(0.05);
-  const [notifyEmail, setNotifyEmail] = useState<string>('sanskruti@modelguard.ai');
   const [retentionDays, setRetentionDays] = useState<number>(90);
   const [isTestingConnection, setIsTestingConnection] = useState<boolean>(false);
 
@@ -31,6 +45,13 @@ export const SettingsPage: React.FC = () => {
     api.setBaseUrl(apiUrl);
     showToast('API Configuration Saved', 'success', `FastAPI endpoint set to ${apiUrl}`);
     refreshHealth();
+  };
+
+  const handleSaveProfile = () => {
+    setUserName(localUserName);
+    setUserRole(localUserRole);
+    setUserEmail(localNotifyEmail);
+    showToast('Operator Profile Saved', 'success', `Display name updated to "${localUserName.trim() || 'User'}"`);
   };
 
   const handleTestConnection = async () => {
@@ -54,8 +75,72 @@ export const SettingsPage: React.FC = () => {
           Workspace Settings & Observability Config
         </h1>
         <p className="text-sm text-brand-slate mt-0.5">
-          Configure API endpoints, automated monitoring intervals, notifications, and security protocols
+          Configure user identity, API endpoints, automated monitoring intervals, and security protocols
         </p>
+      </div>
+
+      {/* Operator Identity & Profile Card */}
+      <div className="card-subtle p-6 sm:p-7 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-brand-border/60 pb-3">
+          <div className="flex items-center gap-3">
+            <User size={20} className="text-brand-indigo" />
+            <div>
+              <h2 className="text-base font-display font-bold text-brand-midnight">
+                Operator Identity & Profile
+              </h2>
+              <p className="text-xs text-brand-slate">
+                Personalize your operator display name, role designation, and incident alert dispatch email
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleSaveProfile}
+            className="self-start sm:self-auto px-4 py-2 rounded-xl bg-brand-indigo text-white text-xs font-bold hover:bg-brand-indigo-dark shadow-sm transition-all"
+          >
+            Save Profile
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div>
+            <label className="text-xs font-bold text-brand-midnight block mb-1">
+              Operator Name
+            </label>
+            <input
+              type="text"
+              value={localUserName}
+              onChange={(e) => setLocalUserName(e.target.value)}
+              placeholder="e.g. User, Vishwajit, Alex"
+              className="w-full px-4 py-2 rounded-xl bg-brand-ivory/60 border border-brand-border text-xs sm:text-sm text-brand-midnight focus:outline-none focus:ring-2 focus:ring-brand-indigo/30 focus:bg-white"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-brand-midnight block mb-1">
+              Platform Role
+            </label>
+            <input
+              type="text"
+              value={localUserRole}
+              onChange={(e) => setLocalUserRole(e.target.value)}
+              placeholder="e.g. ML Platform Lead"
+              className="w-full px-4 py-2 rounded-xl bg-brand-ivory/60 border border-brand-border text-xs sm:text-sm text-brand-midnight focus:outline-none focus:ring-2 focus:ring-brand-indigo/30 focus:bg-white"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-brand-midnight block mb-1">
+              Incident Alert Email
+            </label>
+            <input
+              type="email"
+              value={localNotifyEmail}
+              onChange={(e) => setLocalNotifyEmail(e.target.value)}
+              placeholder="user@modelguard.ai"
+              className="w-full px-4 py-2 rounded-xl bg-brand-ivory/60 border border-brand-border text-xs sm:text-sm text-brand-midnight focus:outline-none focus:ring-2 focus:ring-brand-indigo/30 focus:bg-white"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Backend & Demo Mode Configuration Card */}
@@ -153,7 +238,7 @@ export const SettingsPage: React.FC = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
             <label className="text-xs font-bold text-brand-midnight block mb-1">
               Automated Drift Evaluation Frequency
@@ -195,20 +280,8 @@ export const SettingsPage: React.FC = () => {
               className="w-full px-4 py-2 rounded-xl bg-brand-ivory/60 border border-brand-border text-xs sm:text-sm font-mono text-brand-midnight"
             />
             <span className="text-[10px] text-brand-slate mt-1 block">
-              Inference vectors and distribution histograms retained for {retentionDays} days.
+              Inference vectors retained for {retentionDays} days.
             </span>
-          </div>
-
-          <div>
-            <label className="text-xs font-bold text-brand-midnight block mb-1">
-              Alert Dispatch Email
-            </label>
-            <input
-              type="email"
-              value={notifyEmail}
-              onChange={(e) => setNotifyEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl bg-brand-ivory/60 border border-brand-border text-xs sm:text-sm text-brand-midnight"
-            />
           </div>
         </div>
       </div>

@@ -248,7 +248,7 @@ A. Welcome section
 
 Create a personalized greeting:
 
-"Good morning, Sanskruti."
+"Good morning, User."
 
 Below it:
 

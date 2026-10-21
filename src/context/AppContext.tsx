@@ -34,6 +34,12 @@ interface AppContextType {
   resolveAlertById: (alertId: string) => Promise<void>;
   addNewPrediction: (item: PredictionItem) => void;
   reloadModels: () => Promise<void>;
+  userName: string;
+  setUserName: (name: string) => void;
+  userRole: string;
+  setUserRole: (role: string) => void;
+  userEmail: string;
+  setUserEmail: (email: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -52,6 +58,60 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     apiBaseUrl: DEFAULT_API_URL,
     lastChecked: 'Checking...',
   });
+
+  const [userName, setUserNameState] = useState<string>(() => {
+    try {
+      return localStorage.getItem('modelguard_user_name') || 'User';
+    } catch {
+      return 'User';
+    }
+  });
+
+  const [userRole, setUserRoleState] = useState<string>(() => {
+    try {
+      return localStorage.getItem('modelguard_user_role') || 'ML Platform Lead';
+    } catch {
+      return 'ML Platform Lead';
+    }
+  });
+
+  const [userEmail, setUserEmailState] = useState<string>(() => {
+    try {
+      return localStorage.getItem('modelguard_user_email') || 'user@modelguard.ai';
+    } catch {
+      return 'user@modelguard.ai';
+    }
+  });
+
+  const setUserName = (name: string) => {
+    const val = name.trim() || 'User';
+    setUserNameState(val);
+    try {
+      localStorage.setItem('modelguard_user_name', val);
+    } catch {
+      // ignore
+    }
+  };
+
+  const setUserRole = (role: string) => {
+    const val = role.trim() || 'ML Platform Lead';
+    setUserRoleState(val);
+    try {
+      localStorage.setItem('modelguard_user_role', val);
+    } catch {
+      // ignore
+    }
+  };
+
+  const setUserEmail = (email: string) => {
+    const val = email.trim() || 'user@modelguard.ai';
+    setUserEmailState(val);
+    try {
+      localStorage.setItem('modelguard_user_email', val);
+    } catch {
+      // ignore
+    }
+  };
 
   const showToast = (title: string, type: 'success' | 'warning' | 'error' | 'info' = 'info', message?: string) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
@@ -150,6 +210,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         resolveAlertById,
         addNewPrediction,
         reloadModels,
+        userName,
+        setUserName,
+        userRole,
+        setUserRole,
+        userEmail,
+        setUserEmail,
       }}
     >
       {children}

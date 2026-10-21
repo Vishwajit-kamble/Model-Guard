@@ -28,7 +28,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, setMobileOpen, onOpenTour }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const { unreadAlertsCount, systemHealth, isDemoMode, currentModel } = useApp();
+  const { unreadAlertsCount, systemHealth, isDemoMode, currentModel, userName, userRole } = useApp();
 
   const navGroups = [
     {
@@ -257,15 +257,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, setMobileOpen, onO
             }`}
           >
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-indigo to-brand-mint flex items-center justify-center text-white font-bold text-xs flex-shrink-0 shadow-sm">
-              S
+              {(userName || 'User').charAt(0).toUpperCase()}
             </div>
             {!collapsed && (
               <div className="flex flex-col min-w-0">
                 <span className="text-xs font-semibold text-brand-midnight truncate">
-                  Sanskruti
+                  {userName || 'User'}
                 </span>
                 <span className="text-[10px] text-brand-slate truncate">
-                  ML Platform Lead
+                  {userRole || 'ML Platform Lead'}
                 </span>
               </div>
             )}

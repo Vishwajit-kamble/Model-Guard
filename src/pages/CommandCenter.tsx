@@ -32,7 +32,7 @@ import { DEMO_METRICS, DEMO_TIMELINE } from '../services/mockData';
 import { TimelineEvent } from '../types';
 
 export const CommandCenter: React.FC = () => {
-  const { currentModel, isDemoMode, unreadAlertsCount } = useApp();
+  const { currentModel, isDemoMode, unreadAlertsCount, userName } = useApp();
   const [trendTab, setTrendTab] = useState<'volume' | 'latency' | 'errors' | 'drift'>('volume');
   const [timeRange, setTimeRange] = useState<'1h' | '24h' | '7d'>('24h');
   const [selectedTimelineEvent, setSelectedTimelineEvent] = useState<TimelineEvent | null>(
@@ -78,7 +78,7 @@ export const CommandCenter: React.FC = () => {
             <span className="text-brand-indigo font-medium">Last evaluated 12 mins ago</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-brand-midnight tracking-tight">
-            Good morning, <span className="text-brand-indigo">Sanskruti</span>.
+            Good morning, <span className="text-brand-indigo">{userName || 'User'}</span>.
           </h1>
           <p className="text-sm text-brand-slate mt-0.5">
             Here's what's happening with your machine learning models today.
