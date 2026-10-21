@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Terminal,
   Play,
@@ -12,13 +12,28 @@ import {
   Check,
   ChevronRight,
   Info,
+  Sliders,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { PredictionItem } from '../types';
 
 export const PredictionsExplorer: React.FC = () => {
-  const { currentModel, predictions, addNewPrediction, showToast } = useApp();
+  const { models, currentModelId, setCurrentModelId, currentModel, predictions, addNewPrediction, showToast } = useApp();
+
+  // Custom inputs for dynamic models
+  const [customInputs, setCustomInputs] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (currentModel && currentModel.inputFeatures) {
+      const initial: Record<string, number> = {};
+      currentModel.inputFeatures.forEach((f) => {
+        const val = typeof f.default === 'number' ? f.default : parseFloat(String(f.default));
+        initial[f.name] = !isNaN(val) ? val : (f.min !== undefined ? f.min : 10);
+      });
+      setCustomInputs(initial);
+    }
+  }, [currentModel]);
 
   // Inputs for Iris classifier
   const [sepalLength, setSepalLength] = useState<number>(5.8);
@@ -71,10 +86,19 @@ export const PredictionsExplorer: React.FC = () => {
   };
 
   const handleReset = () => {
-    setSepalLength(5.8);
-    setSepalWidth(3.0);
-    setPetalLength(4.3);
-    setPetalWidth(1.3);
+    if (currentModel?.id === 'model-iris-01') {
+      setSepalLength(5.8);
+      setSepalWidth(3.0);
+      setPetalLength(4.3);
+      setPetalWidth(1.3);
+    } else if (currentModel?.inputFeatures) {
+      const initial: Record<string, number> = {};
+      currentModel.inputFeatures.forEach((f) => {
+        const val = typeof f.default === 'number' ? f.default : parseFloat(String(f.default));
+        initial[f.name] = !isNaN(val) ? val : (f.min !== undefined ? f.min : 10);
+      });
+      setCustomInputs(initial);
+    }
   };
 
   const handleRunPrediction = async () => {
@@ -82,12 +106,15 @@ export const PredictionsExplorer: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const inputs = {
-        sepal_length: sepalLength,
-        sepal_width: sepalWidth,
-        petal_length: petalLength,
-        petal_width: petalWidth,
-      };
+      const inputs: Record<string, number> =
+        currentModel?.id === 'model-iris-01'
+          ? {
+              sepal_length: sepalLength,
+              sepal_width: sepalWidth,
+              petal_length: petalLength,
+              petal_width: petalWidth,
+            }
+          : { ...customInputs };
 
       const result = await api.predict(currentModel?.id || 'model-iris-01', inputs);
       setLatestResult(result);
@@ -97,7 +124,7 @@ export const PredictionsExplorer: React.FC = () => {
         'success',
         `Predicted: ${result.prediction} (${result.latencyMs}ms)`
       );
-    } catch (e) {
+    } catch {
       showToast('Prediction Failed', 'error', 'Unable to complete inference request.');
     } finally {
       setIsLoading(false);
@@ -106,14 +133,32 @@ export const PredictionsExplorer: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-brand-midnight tracking-tight">
-          Predictions Explorer
-        </h1>
-        <p className="text-sm text-brand-slate mt-0.5">
-          Execute real-time interactive inferences against the active model artifact with telemetry profiling
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-brand-midnight tracking-tight">
+            Predictions Explorer
+          </h1>
+          <p className="text-sm text-brand-slate mt-0.5">
+            Execute real-time interactive inferences against the active model artifact with telemetry profiling
+          </p>
+        </div>
+
+        {/* Model Switcher Dropdown */}
+        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-2xl border border-brand-border shadow-subtle">
+          <Layers size={16} className="text-brand-indigo flex-shrink-0" />
+          <span className="text-xs font-bold text-brand-slate">Target Model:</span>
+          <select
+            value={currentModel?.id || currentModelId}
+            onChange={(e) => setCurrentModelId(e.target.value)}
+            className="text-xs font-bold text-brand-midnight bg-transparent focus:outline-none cursor-pointer"
+          >
+            {models.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name} ({m.version})
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Main Runner Grid */}
@@ -139,146 +184,209 @@ export const PredictionsExplorer: React.FC = () => {
             </button>
           </div>
 
-          {/* Quick Presets */}
-          <div className="space-y-2">
-            <span className="text-[11px] uppercase font-bold tracking-wider text-brand-slate block">
-              Quick Benchmark Presets
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {presets.map((preset) => (
-                <button
-                  key={preset.label}
-                  onClick={() => handleApplyPreset(preset.values)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all hover:scale-105 active:scale-95 ${preset.color}`}
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Sliders and Numerical Inputs */}
-          <div className="space-y-5 pt-2">
-            {/* Sepal Length */}
-            <div className="p-4 rounded-2xl bg-brand-ivory/60 border border-brand-border/70 space-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-xs font-bold text-brand-midnight block">
-                    Sepal Length (cm)
-                  </label>
-                  <span className="text-[10px] text-brand-slate">Range: 4.0 - 8.5 cm</span>
+          {/* Features Inputs: Iris botanical presets OR Dynamic Model Features */}
+          {currentModel?.id === 'model-iris-01' ? (
+            <>
+              {/* Quick Presets */}
+              <div className="space-y-2">
+                <span className="text-[11px] uppercase font-bold tracking-wider text-brand-slate block">
+                  Quick Benchmark Presets
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {presets.map((preset) => (
+                    <button
+                      key={preset.label}
+                      onClick={() => handleApplyPreset(preset.values)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all hover:scale-105 active:scale-95 ${preset.color}`}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
                 </div>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="4.0"
-                  max="8.5"
-                  value={sepalLength}
-                  onChange={(e) => setSepalLength(parseFloat(e.target.value) || 4.0)}
-                  className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-white rounded-lg border border-brand-border text-brand-midnight"
-                />
               </div>
-              <input
-                type="range"
-                min="4.0"
-                max="8.5"
-                step="0.1"
-                value={sepalLength}
-                onChange={(e) => setSepalLength(parseFloat(e.target.value))}
-                className="w-full accent-brand-indigo cursor-pointer"
-              />
-            </div>
 
-            {/* Sepal Width */}
-            <div className="p-4 rounded-2xl bg-brand-ivory/60 border border-brand-border/70 space-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-xs font-bold text-brand-midnight block">
-                    Sepal Width (cm)
-                  </label>
-                  <span className="text-[10px] text-brand-slate">Range: 2.0 - 5.0 cm</span>
+              {/* Sliders and Numerical Inputs */}
+              <div className="space-y-5 pt-2">
+                {/* Sepal Length */}
+                <div className="p-4 rounded-2xl bg-brand-ivory/60 border border-brand-border/70 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-xs font-bold text-brand-midnight block">
+                        Sepal Length (cm)
+                      </label>
+                      <span className="text-[10px] text-brand-slate">Range: 4.0 - 8.5 cm</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="4.0"
+                      max="8.5"
+                      value={sepalLength}
+                      onChange={(e) => setSepalLength(parseFloat(e.target.value) || 4.0)}
+                      className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-white rounded-lg border border-brand-border text-brand-midnight"
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    min="4.0"
+                    max="8.5"
+                    step="0.1"
+                    value={sepalLength}
+                    onChange={(e) => setSepalLength(parseFloat(e.target.value))}
+                    className="w-full accent-brand-indigo cursor-pointer"
+                  />
                 </div>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="2.0"
-                  max="5.0"
-                  value={sepalWidth}
-                  onChange={(e) => setSepalWidth(parseFloat(e.target.value) || 2.0)}
-                  className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-white rounded-lg border border-brand-border text-brand-midnight"
-                />
-              </div>
-              <input
-                type="range"
-                min="2.0"
-                max="5.0"
-                step="0.1"
-                value={sepalWidth}
-                onChange={(e) => setSepalWidth(parseFloat(e.target.value))}
-                className="w-full accent-brand-indigo cursor-pointer"
-              />
-            </div>
 
-            {/* Petal Length */}
-            <div className="p-4 rounded-2xl bg-brand-ivory/60 border border-brand-border/70 space-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-xs font-bold text-brand-midnight block">
-                    Petal Length (cm)
-                  </label>
-                  <span className="text-[10px] text-brand-slate">Range: 1.0 - 7.5 cm</span>
+                {/* Sepal Width */}
+                <div className="p-4 rounded-2xl bg-brand-ivory/60 border border-brand-border/70 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-xs font-bold text-brand-midnight block">
+                        Sepal Width (cm)
+                      </label>
+                      <span className="text-[10px] text-brand-slate">Range: 2.0 - 5.0 cm</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="2.0"
+                      max="5.0"
+                      value={sepalWidth}
+                      onChange={(e) => setSepalWidth(parseFloat(e.target.value) || 2.0)}
+                      className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-white rounded-lg border border-brand-border text-brand-midnight"
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    min="2.0"
+                    max="5.0"
+                    step="0.1"
+                    value={sepalWidth}
+                    onChange={(e) => setSepalWidth(parseFloat(e.target.value))}
+                    className="w-full accent-brand-indigo cursor-pointer"
+                  />
                 </div>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="1.0"
-                  max="7.5"
-                  value={petalLength}
-                  onChange={(e) => setPetalLength(parseFloat(e.target.value) || 1.0)}
-                  className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-white rounded-lg border border-brand-border text-brand-midnight"
-                />
-              </div>
-              <input
-                type="range"
-                min="1.0"
-                max="7.5"
-                step="0.1"
-                value={petalLength}
-                onChange={(e) => setPetalLength(parseFloat(e.target.value))}
-                className="w-full accent-brand-indigo cursor-pointer"
-              />
-            </div>
 
-            {/* Petal Width */}
-            <div className="p-4 rounded-2xl bg-brand-ivory/60 border border-brand-border/70 space-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-xs font-bold text-brand-midnight block">
-                    Petal Width (cm)
-                  </label>
-                  <span className="text-[10px] text-brand-slate">Range: 0.1 - 3.0 cm</span>
+                {/* Petal Length */}
+                <div className="p-4 rounded-2xl bg-brand-ivory/60 border border-brand-border/70 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-xs font-bold text-brand-midnight block">
+                        Petal Length (cm)
+                      </label>
+                      <span className="text-[10px] text-brand-slate">Range: 1.0 - 7.5 cm</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="1.0"
+                      max="7.5"
+                      value={petalLength}
+                      onChange={(e) => setPetalLength(parseFloat(e.target.value) || 1.0)}
+                      className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-white rounded-lg border border-brand-border text-brand-midnight"
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    min="1.0"
+                    max="7.5"
+                    step="0.1"
+                    value={petalLength}
+                    onChange={(e) => setPetalLength(parseFloat(e.target.value))}
+                    className="w-full accent-brand-indigo cursor-pointer"
+                  />
                 </div>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0.1"
-                  max="3.0"
-                  value={petalWidth}
-                  onChange={(e) => setPetalWidth(parseFloat(e.target.value) || 0.1)}
-                  className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-white rounded-lg border border-brand-border text-brand-midnight"
-                />
+
+                {/* Petal Width */}
+                <div className="p-4 rounded-2xl bg-brand-ivory/60 border border-brand-border/70 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-xs font-bold text-brand-midnight block">
+                        Petal Width (cm)
+                      </label>
+                      <span className="text-[10px] text-brand-slate">Range: 0.1 - 3.0 cm</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      max="3.0"
+                      value={petalWidth}
+                      onChange={(e) => setPetalWidth(parseFloat(e.target.value) || 0.1)}
+                      className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-white rounded-lg border border-brand-border text-brand-midnight"
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="3.0"
+                    step="0.1"
+                    value={petalWidth}
+                    onChange={(e) => setPetalWidth(parseFloat(e.target.value))}
+                    className="w-full accent-brand-indigo cursor-pointer"
+                  />
+                </div>
               </div>
-              <input
-                type="range"
-                min="0.1"
-                max="3.0"
-                step="0.1"
-                value={petalWidth}
-                onChange={(e) => setPetalWidth(parseFloat(e.target.value))}
-                className="w-full accent-brand-indigo cursor-pointer"
-              />
+            </>
+          ) : (
+            /* Dynamic Inputs for Custom Models */
+            <div className="space-y-4 pt-2">
+              <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200 text-xs text-blue-950 flex items-center justify-between">
+                <span>
+                  <strong>Dynamic Schema Runner:</strong> Monitored features loaded for <strong>{currentModel?.name}</strong>.
+                </span>
+                <span className="font-mono text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+                  {currentModel?.type}
+                </span>
+              </div>
+
+              {(currentModel?.inputFeatures || []).map((feat) => {
+                const minVal = feat.min !== undefined ? feat.min : 0;
+                const maxVal = feat.max !== undefined ? feat.max : 100;
+                const curVal = customInputs[feat.name] !== undefined ? customInputs[feat.name] : (feat.default || minVal);
+                const step = maxVal - minVal <= 10 ? 0.1 : 1;
+
+                return (
+                  <div key={feat.name} className="p-4 rounded-2xl bg-brand-ivory/60 border border-brand-border/70 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <label className="text-xs font-bold text-brand-midnight block">
+                          {feat.displayName || feat.name} {feat.unit ? `(${feat.unit})` : ''}
+                        </label>
+                        <span className="text-[10px] text-brand-slate">
+                          {feat.description || `Range: ${minVal} - ${maxVal}`}
+                        </span>
+                      </div>
+                      <input
+                        type="number"
+                        step={step}
+                        min={minVal}
+                        max={maxVal}
+                        value={curVal}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          setCustomInputs((prev) => ({ ...prev, [feat.name]: isNaN(val) ? minVal : val }));
+                        }}
+                        className="w-24 px-2 py-1 text-right font-mono font-bold text-sm bg-white rounded-lg border border-brand-border text-brand-midnight"
+                      />
+                    </div>
+                    <input
+                      type="range"
+                      min={minVal}
+                      max={maxVal}
+                      step={step}
+                      value={curVal}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        setCustomInputs((prev) => ({ ...prev, [feat.name]: val }));
+                      }}
+                      className="w-full accent-brand-indigo cursor-pointer"
+                    />
+                  </div>
+                );
+              })}
             </div>
-          </div>
+          )}
 
           {/* Primary Action Button */}
           <div className="pt-2">

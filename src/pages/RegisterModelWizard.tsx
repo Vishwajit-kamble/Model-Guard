@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Layers,
@@ -12,9 +12,12 @@ import {
   AlertCircle,
   Plus,
   Trash2,
+  RefreshCw,
+  FileUp,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
+import { api } from '../services/api';
 import { FeatureSchema } from '../types';
 
 export const RegisterModelWizard: React.FC = () => {
@@ -39,6 +42,46 @@ export const RegisterModelWizard: React.FC = () => {
     name: 'crop_yield_model.pkl',
     size: '14.2 MB',
   });
+  const artifactInputRef = useRef<HTMLInputElement>(null);
+  const datasetInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingArtifact, setIsUploadingArtifact] = useState<boolean>(false);
+  const [isUploadingDataset, setIsUploadingDataset] = useState<boolean>(false);
+  const [isDraggingArtifact, setIsDraggingArtifact] = useState<boolean>(false);
+  const [isDraggingDataset, setIsDraggingDataset] = useState<boolean>(false);
+
+  const handleArtifactFile = async (file: File) => {
+    setIsUploadingArtifact(true);
+    try {
+      const res = await api.uploadArtifact(file);
+      setArtifactFile({ name: res.filename, size: res.size });
+      showToast('Artifact Uploaded', 'success', `${res.filename} (${res.size}) validated.`);
+    } catch {
+      showToast('Upload Error', 'error', 'Unable to upload model artifact.');
+    } finally {
+      setIsUploadingArtifact(false);
+    }
+  };
+
+  const handleDatasetFile = (file: File) => {
+    setIsUploadingDataset(true);
+    setReferenceFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      if (text) {
+        const lines = text.trim().split('\n').filter((l) => l.trim().length > 0);
+        const count = Math.max(1, lines.length - 1);
+        setReferenceSampleCount(count);
+        showToast('Baseline Ingested', 'success', `Loaded ${count} observations from ${file.name}`);
+      }
+      setIsUploadingDataset(false);
+    };
+    reader.onerror = () => {
+      showToast('File Read Error', 'error', 'Unable to read dataset content.');
+      setIsUploadingDataset(false);
+    };
+    reader.readAsText(file);
+  };
 
   // Step 3: Input features
   const [features, setFeatures] = useState<FeatureSchema[]>([
@@ -78,6 +121,10 @@ export const RegisterModelWizard: React.FC = () => {
   const handleNext = () => {
     if (currentStep === 1 && !modelName.trim()) {
       showToast('Validation Error', 'error', 'Model name is required.');
+      return;
+    }
+    if (currentStep === 2 && !artifactFile) {
+      showToast('Validation Error', 'error', 'Please upload or select a model artifact.');
       return;
     }
     setCurrentStep((prev) => Math.min(5, prev + 1));
@@ -298,27 +345,77 @@ export const RegisterModelWizard: React.FC = () => {
                 Step 2: Model Artifact Deployment
               </h2>
               <p className="text-xs text-brand-slate">
-                Select your serialized model weights or binary bundle
+                Select your serialized model weights or binary bundle (.pkl, .joblib, .onnx, .pt, .safetensors, etc.)
               </p>
             </div>
 
-            <div className="border-2 border-dashed border-brand-border hover:border-brand-indigo rounded-2xl p-8 text-center space-y-3 bg-brand-ivory/40 transition-colors">
-              <UploadCloud size={40} className="mx-auto text-brand-indigo" />
-              <div>
-                <p className="text-sm font-semibold text-brand-midnight">
-                  Drag and drop your serialized artifact or click to browse
-                </p>
-                <p className="text-xs text-brand-slate mt-0.5">
-                  Supported formats: .pkl, .onnx, .joblib, .pt, .safetensors (Max 250MB)
-                </p>
-              </div>
+            <input
+              type="file"
+              ref={artifactInputRef}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleArtifactFile(e.target.files[0]);
+                }
+              }}
+              accept=".pkl,.joblib,.onnx,.pt,.safetensors,.h5,.bin"
+              className="hidden"
+            />
 
-              {artifactFile && (
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-brand-border shadow-subtle text-xs font-mono font-bold text-brand-midnight mt-2">
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDraggingArtifact(true);
+              }}
+              onDragLeave={() => setIsDraggingArtifact(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDraggingArtifact(false);
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                  handleArtifactFile(e.dataTransfer.files[0]);
+                }
+              }}
+              onClick={() => artifactInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-2xl p-8 text-center space-y-3 transition-all cursor-pointer ${
+                isDraggingArtifact
+                  ? 'border-brand-indigo bg-brand-indigo-tint/30 scale-[1.01]'
+                  : 'border-brand-border hover:border-brand-indigo bg-brand-ivory/40'
+              }`}
+            >
+              {isUploadingArtifact ? (
+                <div className="py-4 space-y-2">
+                  <RefreshCw size={36} className="mx-auto text-brand-indigo animate-spin" />
+                  <p className="text-sm font-bold text-brand-midnight">Uploading & Validating Artifact...</p>
+                </div>
+              ) : (
+                <>
+                  <UploadCloud size={40} className="mx-auto text-brand-indigo" />
+                  <div>
+                    <p className="text-sm font-semibold text-brand-midnight">
+                      Drag & drop your serialized artifact or <span className="text-brand-indigo font-bold underline">click to browse</span>
+                    </p>
+                    <p className="text-xs text-brand-slate mt-0.5">
+                      Supported formats: .pkl, .joblib, .onnx, .pt, .safetensors (Max 250MB)
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {artifactFile && !isUploadingArtifact && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-brand-border shadow-subtle text-xs font-mono font-bold text-brand-midnight mt-2"
+                >
                   <FileCode size={15} className="text-brand-indigo" />
                   <span>{artifactFile.name}</span>
                   <span className="text-brand-slate">({artifactFile.size})</span>
                   <span className="text-emerald-600 font-sans font-semibold ml-2">✓ Validated</span>
+                  <button
+                    type="button"
+                    onClick={() => artifactInputRef.current?.click()}
+                    className="ml-2 text-[11px] font-sans text-brand-indigo hover:underline font-bold"
+                  >
+                    Change
+                  </button>
                 </div>
               )}
             </div>
@@ -437,6 +534,57 @@ export const RegisterModelWizard: React.FC = () => {
               </p>
             </div>
 
+            <input
+              type="file"
+              ref={datasetInputRef}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleDatasetFile(e.target.files[0]);
+                }
+              }}
+              accept=".csv,.json"
+              className="hidden"
+            />
+
+            {/* Baseline Dropzone / Browse */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDraggingDataset(true);
+              }}
+              onDragLeave={() => setIsDraggingDataset(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDraggingDataset(false);
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                  handleDatasetFile(e.dataTransfer.files[0]);
+                }
+              }}
+              onClick={() => datasetInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-2xl p-6 text-center space-y-2 transition-all cursor-pointer ${
+                isDraggingDataset
+                  ? 'border-brand-indigo bg-brand-indigo-tint/30 scale-[1.01]'
+                  : 'border-brand-border hover:border-brand-indigo bg-brand-ivory/40'
+              }`}
+            >
+              {isUploadingDataset ? (
+                <div className="py-2 space-y-1">
+                  <RefreshCw size={28} className="mx-auto text-brand-indigo animate-spin" />
+                  <p className="text-xs font-bold text-brand-midnight">Parsing Baseline File...</p>
+                </div>
+              ) : (
+                <>
+                  <FileUp size={32} className="mx-auto text-brand-indigo" />
+                  <p className="text-xs sm:text-sm font-semibold text-brand-midnight">
+                    Drop your reference dataset (<code className="font-mono text-brand-indigo font-bold">.csv</code> or <code className="font-mono text-brand-indigo font-bold">.json</code>) or <span className="text-brand-indigo underline font-bold">click to browse</span>
+                  </p>
+                  <p className="text-[11px] text-brand-slate">
+                    Automatically extracts row counts and maps features to your schema
+                  </p>
+                </>
+              )}
+            </div>
+
             <div className="p-4 rounded-2xl bg-brand-ivory border border-brand-border space-y-4">
               <div className="flex items-center gap-3">
                 <Database size={24} className="text-brand-indigo flex-shrink-0" />
@@ -480,7 +628,7 @@ export const RegisterModelWizard: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 flex items-start gap-2">
               <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
               <span>
-                Baseline verified. 100% column schema match with all {features.length} features.
+                Baseline verified. 100% column schema match with all {features.length} features ({referenceSampleCount.toLocaleString()} rows).
               </span>
             </div>
           </div>

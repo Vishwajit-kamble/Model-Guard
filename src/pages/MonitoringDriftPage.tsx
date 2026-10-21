@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   GitCompare,
   ArrowRight,
@@ -13,6 +14,7 @@ import {
   BarChart2,
   TrendingDown,
   CheckCircle2,
+  Layers,
 } from 'lucide-react';
 import {
   BarChart,
@@ -29,7 +31,7 @@ import { api } from '../services/api';
 import { DriftEvaluation, FeatureDriftResult } from '../types';
 
 export const MonitoringDriftPage: React.FC = () => {
-  const { currentModel, showToast } = useApp();
+  const { models, currentModelId, setCurrentModelId, currentModel, showToast } = useApp();
   const [evaluation, setEvaluation] = useState<DriftEvaluation | null>(null);
   const [selectedFeature, setSelectedFeature] = useState<FeatureDriftResult | null>(null);
   const [windowOption, setWindowOption] = useState<'1h' | '24h' | '7d'>('24h');
@@ -149,23 +151,41 @@ export const MonitoringDriftPage: React.FC = () => {
 
       {/* Evaluation Window Controls & Trigger Bar */}
       <div className="card-subtle p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Calendar size={16} className="text-brand-indigo" />
-          <span className="text-xs font-bold text-brand-midnight">Evaluation Horizon:</span>
-          <div className="flex items-center gap-1 bg-brand-ivory p-1 rounded-xl border border-brand-border">
-            {(['1h', '24h', '7d'] as const).map((w) => (
-              <button
-                key={w}
-                onClick={() => setWindowOption(w)}
-                className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
-                  windowOption === w
-                    ? 'bg-white text-brand-midnight shadow-subtle'
-                    : 'text-brand-slate hover:text-brand-midnight'
-                }`}
-              >
-                {w === '1h' ? 'Last Hour' : w === '24h' ? 'Last 24 Hours' : 'Last 7 Days'}
-              </button>
-            ))}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Layers size={16} className="text-brand-indigo" />
+            <span className="text-xs font-bold text-brand-midnight">Target:</span>
+            <select
+              value={currentModel?.id || currentModelId}
+              onChange={(e) => setCurrentModelId(e.target.value)}
+              className="text-xs font-semibold px-2 py-1.5 rounded-xl bg-brand-ivory border border-brand-border text-brand-midnight cursor-pointer"
+            >
+              {models.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Calendar size={16} className="text-brand-indigo" />
+            <span className="text-xs font-bold text-brand-midnight">Horizon:</span>
+            <div className="flex items-center gap-1 bg-brand-ivory p-1 rounded-xl border border-brand-border">
+              {(['1h', '24h', '7d'] as const).map((w) => (
+                <button
+                  key={w}
+                  onClick={() => setWindowOption(w)}
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                    windowOption === w
+                      ? 'bg-white text-brand-midnight shadow-subtle'
+                      : 'text-brand-slate hover:text-brand-midnight'
+                  }`}
+                >
+                  {w === '1h' ? 'Last Hour' : w === '24h' ? 'Last 24 Hours' : 'Last 7 Days'}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -206,10 +226,32 @@ export const MonitoringDriftPage: React.FC = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {evaluation.features.map((feat) => {
-            const isSelected = selectedFeature?.featureName === feat.featureName;
-            const isWarning = feat.status === 'warning';
+        {evaluation.features.length === 0 ? (
+          <div className="card-subtle p-8 text-center space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-brand-indigo-tint text-brand-indigo flex items-center justify-center mx-auto shadow-sm">
+              <Clock size={28} />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-display font-bold text-brand-midnight">
+                Awaiting Prediction Telemetry for {evaluation.modelName || currentModel?.name}
+              </h3>
+              <p className="text-xs sm:text-sm text-brand-slate max-w-lg mx-auto">
+                {evaluation.plainSummary || 'At least 5 live incoming predictions are needed to calculate two-sample Kolmogorov-Smirnov statistical divergence tests.'}
+              </p>
+            </div>
+            <Link
+              to="/predictions"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-indigo text-white text-xs sm:text-sm font-semibold hover:bg-brand-indigo-dark shadow-sm transition-all"
+            >
+              <span>Run Test Predictions in Explorer</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {evaluation.features.map((feat) => {
+              const isSelected = selectedFeature?.featureName === feat.featureName;
+              const isWarning = feat.status === 'warning';
 
             return (
               <div
@@ -270,6 +312,7 @@ export const MonitoringDriftPage: React.FC = () => {
             );
           })}
         </div>
+        )}
       </div>
 
       {/* C. Distribution Comparison Deep Dive */}

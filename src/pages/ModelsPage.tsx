@@ -92,6 +92,7 @@ export const ModelsPage: React.FC = () => {
             <option value="healthy">Healthy</option>
             <option value="warning">Warning / Drift</option>
             <option value="critical">Critical</option>
+            <option value="insufficient_data">Awaiting Telemetry</option>
           </select>
 
           {/* Type Filter */}
@@ -173,6 +174,10 @@ export const ModelsPage: React.FC = () => {
               statusBadge = 'bg-rose-50 text-rose-800 border-rose-200';
               StatusIcon = AlertCircle;
               statusLabel = 'Critical Incident';
+            } else if (model.status === 'insufficient_data') {
+              statusBadge = 'bg-blue-50 text-blue-800 border-blue-200';
+              StatusIcon = Clock;
+              statusLabel = 'Awaiting Telemetry';
             }
 
             return (
@@ -300,13 +305,17 @@ export const ModelsPage: React.FC = () => {
                     <td className="px-5 py-4 uppercase font-mono text-brand-slate">{model.type}</td>
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border capitalize ${
                           model.status === 'healthy'
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            : 'bg-amber-50 text-amber-800 border-amber-200'
+                            : model.status === 'warning'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200'
+                            : model.status === 'critical'
+                            ? 'bg-rose-50 text-rose-800 border-rose-200'
+                            : 'bg-blue-50 text-blue-800 border-blue-200'
                         }`}
                       >
-                        {model.status}
+                        {model.status === 'insufficient_data' ? 'Awaiting Telemetry' : model.status}
                       </span>
                     </td>
                     <td className="px-5 py-4 font-mono">{model.totalPredictions.toLocaleString()}</td>

@@ -83,11 +83,21 @@ export const ModelDetailsPage: React.FC = () => {
                   className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${
                     model.status === 'healthy'
                       ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                      : 'bg-amber-50 text-amber-800 border-amber-200'
+                      : model.status === 'warning'
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : model.status === 'critical'
+                      ? 'bg-rose-50 text-rose-800 border-rose-200'
+                      : 'bg-blue-50 text-blue-800 border-blue-200'
                   }`}
                 >
-                  {model.status === 'healthy' ? <ShieldCheck size={13} /> : <AlertTriangle size={13} />}
-                  <span className="capitalize">{model.status}</span>
+                  {model.status === 'healthy' ? (
+                    <ShieldCheck size={13} />
+                  ) : model.status === 'insufficient_data' ? (
+                    <Clock size={13} />
+                  ) : (
+                    <AlertTriangle size={13} />
+                  )}
+                  <span className="capitalize">{model.status === 'insufficient_data' ? 'Awaiting Telemetry' : model.status}</span>
                 </span>
 
                 <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-md bg-brand-ivory border border-brand-border text-brand-slate">
@@ -187,10 +197,11 @@ export const ModelDetailsPage: React.FC = () => {
             </div>
 
             {/* Input Features Schema Table */}
+            {/* Input Features Schema Table */}
             <div className="card-subtle p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-display font-extrabold text-brand-midnight">
-                  Input Feature Specifications ({model.inputFeatures.length} Monitored Features)
+                  Input Feature Specifications ({(model.inputFeatures || []).length} Monitored Features)
                 </h3>
                 <span className="text-xs font-mono text-brand-slate">Strict Schema Enforced</span>
               </div>
@@ -207,7 +218,7 @@ export const ModelDetailsPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-brand-border/60">
-                    {model.inputFeatures.map((f) => (
+                    {(model.inputFeatures || []).map((f) => (
                       <tr key={f.name} className="hover:bg-brand-ivory/40">
                         <td className="px-4 py-3 font-mono font-bold text-brand-midnight">
                           {f.name}
@@ -240,20 +251,20 @@ export const ModelDetailsPage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <Database size={16} className="text-brand-indigo" />
                   <span className="text-xs font-bold text-brand-midnight truncate">
-                    {model.referenceDataset.name}
+                    {model.referenceDataset?.name || 'reference_dataset.csv'}
                   </span>
                 </div>
                 <div className="text-xs text-brand-slate space-y-1 pt-1 border-t border-brand-border/60">
                   <div className="flex justify-between">
                     <span>Sample Count:</span>
                     <span className="font-mono font-bold text-brand-midnight">
-                      {model.referenceDataset.sampleCount.toLocaleString()} rows
+                      {(model.referenceDataset?.sampleCount || 0).toLocaleString()} rows
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Uploaded:</span>
                     <span className="font-mono text-brand-midnight">
-                      {model.referenceDataset.uploadedAt}
+                      {model.referenceDataset?.uploadedAt || model.registeredAt}
                     </span>
                   </div>
                 </div>
